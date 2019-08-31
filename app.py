@@ -7,23 +7,37 @@ import time
 from bs4 import BeautifulSoup
 import urllib.request
 import requests
+import threading
 
-@app.route('/')
-def start():
-	opener = urllib.request.build_opener()
-	opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-	pasteURL = "https://portal-widgets-v3.foreks.com/symbol-summary?code=XAU/TRL"
-	response = opener.open(pasteURL)
-	page = response.read().decode('utf-8')
-	parse = BeautifulSoup(page,"html.parser")
-	Gold = format((float((parse.find_all('strong')[0].get_text()).replace('.','').replace(',','.'))/31.1034807), '.2f')
-	Badem = format((float(Gold)/100), '.4f')
-	Binance = requests.get('https://api.binance.com/api/v1/ticker/price?symbol=NANOBTC').json()
-	BinanceNANO = (Binance['price'])
-	Paribu = requests.get('https://www.paribu.com/ticker').json()
-	ParibuBTC = Paribu['BTC_TL']['last']
+def price():
+	global Gold, Badem, BinanceNANO, ParibuBTC
+	threading.Timer(5.0, price).start()
 	try:
-		pasteURL = "http://kuyumcu.badem.io"
+		opener = urllib.request.build_opener()
+		opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+		pasteURL = "https://portal-widgets-v3.foreks.com/symbol-summary?code=XAU/TRL"
+		response = opener.open(pasteURL)
+		page = response.read().decode('utf-8')
+		parse = BeautifulSoup(page,"html.parser")
+		Gold = format((float((parse.find_all('strong')[0].get_text()).replace('.','').replace(',','.'))/31.1034807), '.2f')
+		Badem = format((float(Gold)/100), '.4f')
+		Binance = requests.get('https://api.binance.com/api/v1/ticker/price?symbol=NANOBTC').json()
+		BinanceNANO = (Binance['price'])
+		Paribu = requests.get('https://www.paribu.com/ticker').json()
+		ParibuBTC = Paribu['BTC_TL']['last']
+	except:
+		Gold = '-'
+		Badem = '-'
+price()
+
+
+def KuyumcuPrice():
+	global Title_1, BuyPrice, SellPrice, BademTRY_buy_1, BademTRY_sell_1, BuySellRate_1
+	threading.Timer(5.0, price).start()
+	try:
+		opener = urllib.request.build_opener()
+		opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+		pasteURL = "https://kuyumcu.badem.io"
 		response = opener.open(pasteURL)
 		page = response.read().decode('utf-8')
 		parse = BeautifulSoup(page,"html.parser")
@@ -42,7 +56,10 @@ def start():
 		BuySellRate_1 = 'Kullanılamıyor.'
 		BademTRY_buy_1 = '-'
 		BademTRY_sell_1 = '-'
+KuyumcuPrice()
 
+@app.route('/')
+def start():
 	return render_template('start.html', GoldPrice=Gold, BademPrice=Badem, Name_1=Title_1, BademBuySellRate_1=BuySellRate_1)
 
 if __name__ == "__main__":
