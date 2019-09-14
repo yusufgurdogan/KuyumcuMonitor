@@ -33,7 +33,7 @@ price()
 
 def KuyumcuPrice():
 	global Title_1, BuyPrice, SellPrice, BademTRY_buy_1, BademTRY_sell_1, BuySellRate_1
-	threading.Timer(5.0, price).start()
+	threading.Timer(5.0, KuyumcuPrice).start()
 	try:
 		opener = urllib.request.build_opener()
 		opener.addheaders = [('User-agent', 'Mozilla/5.0')]
