@@ -15,11 +15,13 @@ def price():
 	try:
 		opener = urllib.request.build_opener()
 		opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-		pasteURL = "https://portal-widgets-v3.foreks.com/symbol-summary?code=XAU/TRL"
+		pasteURL = "https://investing.com/currencies/gau-try"
 		response = opener.open(pasteURL)
 		page = response.read().decode('utf-8')
 		parse = BeautifulSoup(page,"html.parser")
-		Gold = format((float((parse.find_all('strong')[0].get_text()).replace('.','').replace(',','.'))/31.1034807), '.2f')
+		for gold in parse.find_all('span', class_="pid-50655-last"):
+			InputText = gold.text.encode('utf-8')
+		Gold=(float(InputText))/1
 		Badem = format((float(Gold)/100), '.4f')
 		Binance = requests.get('https://api.binance.com/api/v1/ticker/price?symbol=NANOBTC').json()
 		BinanceNANO = (Binance['price'])
@@ -63,4 +65,4 @@ def start():
 	return render_template('start.html', GoldPrice=Gold, BademPrice=Badem, Name_1=Title_1, BademBuySellRate_1=BuySellRate_1)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port='1337')
+	app.run(host='0.0.0.0', port='1337', threaded=True)
